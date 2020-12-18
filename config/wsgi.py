@@ -24,7 +24,6 @@ env = environ.Env()
 READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
 WSGI_PATH = environ.Path(__file__)  # radon/radon/config/wsgi.py
 ROOT_DIR = ROOT_DIR = WSGI_PATH - 2
-sys.path.append(str(ROOT_DIR / "chipstore"))
 
 if READ_DOT_ENV_FILE:
     # Operating System Environment variables have precedence over variables defined in the .env file,
