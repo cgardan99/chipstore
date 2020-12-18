@@ -23,7 +23,7 @@ from django.core.wsgi import get_wsgi_application
 env = environ.Env()
 READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
 WSGI_PATH = environ.Path(__file__)  # radon/radon/config/wsgi.py
-ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent
+ROOT_DIR = ROOT_DIR = WSGI_PATH - 2
 sys.path.append(str(ROOT_DIR / "chipstore"))
 
 if READ_DOT_ENV_FILE:
