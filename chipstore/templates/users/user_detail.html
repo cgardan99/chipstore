@@ -27,7 +27,7 @@
   <div class="row">
     <div class="col-1"></div>
     <div class="col-10">
-      {% if object.compra_set.exists %}
+      {% if carrito %}
       <h2>Mis compras:</h2>
       <table class="table table-light table-hover">
         <tr>
@@ -36,7 +36,7 @@
           <th>Total Compra</th>
           <th>Ver</th>
         </tr>
-        {% for compra in object.compra_set.all %}
+        {% for compra in carrito %}
         <tr>
           <td>{{ compra.id }}</td>
           <td>{{ compra.fecha }}</td>

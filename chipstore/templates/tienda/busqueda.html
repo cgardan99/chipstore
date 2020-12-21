@@ -1,7 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
-{% load modulo_tag %}
-{% load restar %}
+{% load static modulo_tag restar commapunto %}
 {% block content %}
 <div class="row">
     <div class="col-1"></div>
@@ -27,7 +25,7 @@
                     <div class="card" style="width: 18rem;">
                         <img class="card-img-top" src="{{ resultado.thumbnail }}" alt="Card image cap">
                         <br class="d-none" id="info-{{ forloop.counter0 }}" data-imagen="{{ resultado.thumbnail }}"
-                            data-nombre="{{ resultado.nombre }}" data-precio="{{ resultado.precio }}"
+                            data-nombre="{{ resultado.nombre }}" data-precio="{{ resultado.precio|commapunto }}"
                             data-sku="{{ resultado.sku }}" data-tienda="{{ resultado.tienda }}"
                             data-url="{{ resultado.url }}" data-descripcion="{{ resultado.descripcion }}" />
                         <div class="card-body">
@@ -52,7 +50,7 @@
                             </div><br>
                             {% endif %}
                             <h5 class="card-title">{{ resultado.nombre }}</h5>
-                            <p class="card-text">{{ resultado.precio }}</p>
+                            <p class="card-text">{{ resultado.precio|commapunto }}</p>
                             <p class="card-text">SKU: {{ resultado.sku }}</p>
                             <div class="row">
                                 <div class="col-6">Tienda: <a href="">{{ resultado.tienda }}</a></div>

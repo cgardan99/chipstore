@@ -1,7 +1,7 @@
-import http.client
 import json
+import requests
 from datetime import datetime
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views import generic
 from django.http import JsonResponse
 from django.urls import reverse, exceptions
@@ -12,7 +12,7 @@ from django.template.response import TemplateResponse
 
 TARGET_URI = "https://www.target.com/"
 
-# Create your views here.
+
 class HomeView(generic.TemplateView):
     template_name = "pages/home.html"
 
@@ -135,39 +135,44 @@ class ResultsView(generic.TemplateView):
         except exceptions.NoReverseMatch:
             return redirect(reverse("tienda:resultados", kwargs={"busqueda": kwargs["busqueda"]}))
 
+    def request_api(self, url, params, headers={}, timeout=3):
+        try:
+            req = requests.get(url, params=params, headers=headers, timeout=timeout,)
+            return req.json()
+        except (json.decoder.JSONDecodeError, requests.exceptions.RequestException):
+            return []
+
     def get_context_data(self, **kwargs):
         context = super(ResultsView, self).get_context_data(**kwargs)
         context["resultados"] = []
         busqueda = kwargs["busqueda"]
         for tienda in Tienda.objects.all():
-            conn = http.client.HTTPSConnection(tienda.base_api_url.split("http://")[1])
             if tienda.nombre == "TARGET":
                 headers = {
                     "x-rapidapi-key": tienda.api_key,
-                    "x-rapidapi-host": tienda.base_api_url.split("http://")[1],
+                    "x-rapidapi-host": tienda.base_api_url.split("https://")[1],
                 }
-                conn.request(
-                    "GET",
-                    r"/product/search?store_id=2475&keyword={}&sponsored=1&limit=50&offset=0".format(
-                        busqueda
-                    ),
-                    headers=headers,
-                )
-                res = conn.getresponse()
-                data = res.read()
-                respuesta = json.loads(data.decode("utf-8"))
+                base_url = tienda.base_api_url + '/product/search'
+                params = {
+                    'store_id': '2475',
+                    'keyword': busqueda,
+                    'sponsored': '1',
+                    'limit': '50',
+                    'offset': '0'
+                }
+                respuesta = self.request_api(base_url, params, headers)
                 context["resultados"] += crear_objeto_tienda(
                     tienda.nombre, respuesta
                 )
             elif tienda.nombre == "BESTBUY":
+                base_url = tienda.base_api_url + '/v1/products(search={})'.format(busqueda)
                 for i in range(1, 4):
-                    conn.request(
-                        "GET",
-                        r"/v1/products(search={})?format=json&page={}&show=sku,salePrice,name,url,image,shortDescription&apiKey={}".format(busqueda, i, tienda.api_key),
-                    )
-                    res = conn.getresponse()
-                    data = res.read()
-                    respuesta = json.loads(data.decode("utf-8"))
+                    params = {
+                        'format': 'json', 'page': i,
+                        'show': 'sku,salePrice,name,url,image,shortDescription',
+                        'apiKey': tienda.api_key
+                    }
+                    respuesta = self.request_api(base_url, params)
                     context["resultados"] += crear_objeto_tienda(
                         tienda.nombre, respuesta
                     )

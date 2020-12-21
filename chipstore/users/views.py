@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, RedirectView, UpdateView
+from chipstore.tienda.models import Compra
 
 User = get_user_model()
 
@@ -13,6 +14,17 @@ class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
     slug_field = "username"
     slug_url_kwarg = "username"
+
+    def get_context_data(self, **kwargs):
+        context = super(UserDetailView, self).get_context_data(**kwargs)
+        try:
+            context["carrito"] = Compra.objects.filter(
+                usuario = self.request.user,
+                confirmado = True
+            )
+        except Compra.DoesNotExist:
+            context["carrito"] = None
+        return context
 
 
 user_detail_view = UserDetailView.as_view()

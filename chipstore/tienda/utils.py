@@ -7,35 +7,36 @@ def crear_objeto_tienda(tienda, respuesta):
     target = Tienda.objects.get(nombre="TARGET")
     bby = Tienda.objects.get(nombre="BESTBUY")
     objeto = []
-    if tienda == "BESTBUY":
-        try:
-            for producto in respuesta["products"]:
-                objeto.append({
-                    "tienda": "BESTBUY",
-                    "url": producto["url"],
-                    "sku": producto["sku"],
-                    "thumbnail": producto["image"],
-                    "nombre": producto["name"],
-                    "precio": producto["salePrice"],
-                    "descripcion": producto["shortDescription"]
-                })
-        except KeyError:
-            pass
-    elif tienda == "TARGET":
-        try:
-            for producto in respuesta["products"]:
-                img = producto["images"][0]
-                objeto.append({
-                    "tienda": "TARGET",
-                    "url": target.base_web_url + producto["url"],
-                    "sku": producto["tcin"],
-                    "precio": producto["price"]["formatted_current_price"],
-                    "thumbnail": img["base_url"] + img["primary"],
-                    "nombre": producto["title"],
-                    "descripcion": producto["description"]
-                })
-        except KeyError:
-            pass
+    if len(respuesta) > 0:
+        if tienda == "BESTBUY":
+            try:
+                for producto in respuesta["products"]:
+                    objeto.append({
+                        "tienda": "BESTBUY",
+                        "url": producto["url"],
+                        "sku": producto["sku"],
+                        "thumbnail": producto["image"],
+                        "nombre": producto["name"],
+                        "precio": producto["salePrice"],
+                        "descripcion": producto["shortDescription"]
+                    })
+            except KeyError:
+                pass
+        elif tienda == "TARGET":
+            try:
+                for producto in respuesta["products"]:
+                    img = producto["images"][0]
+                    objeto.append({
+                        "tienda": "TARGET",
+                        "url": target.base_web_url + producto["url"],
+                        "sku": producto["tcin"],
+                        "precio": producto["price"]["formatted_current_price"],
+                        "thumbnail": img["base_url"] + img["primary"],
+                        "nombre": producto["title"],
+                        "descripcion": producto["description"]
+                    })
+            except KeyError:
+                pass
     return objeto
 
 
