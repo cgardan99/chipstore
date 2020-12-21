@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row mt-3">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <h2>Tu wishlist.</h2>
+        <br>
+        {% if wishlist.itemwhishlist_set.exists %}
+        <table class="table table-hover table-dark">
+            <tr>
+                <th>Tienda</th>
+                <th>SKU</th>
+                <th>Nombre</th>
+                <th>Imagen</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>PU</th>
+                <th>Subtotal</th>
+                <th>Enviar al Carrito</th>
+                <th>Eliminar</th>
+            </tr>
+            {% for item in wishlist.itemwhishlist_set.all %}
+            <tr>
+                <td>{{ item.item.tienda }}</td>
+                <td>{{ item.item.sku }}</td>
+                <td>{{ item.item.nombre }}</td>
+                <td>
+                    <img class="w-50" src="{{ item.item.foto }}" alt="foto_referencia_producto">
+                </td>
+                <td>{{ item.item.descripcion }}</td>
+                <td>
+                    <input class="cantidad form-control" id="cantidad-{{ forloop.counter0 }}" type="number" step="1"
+                        value="{{item.cantidad}}" min="1">
+                </td>
+                <td id="precio-{{ forloop.counter0 }}">{{ item.item.precio }}</td>
+                <td id="subtotal-{{ forloop.counter0 }}"></td>
+                <td>
+                    <button class="btn btn-success" onclick="enviaracarrito({{ forloop.counter0 }}, {{ item.id }})">Enviar al Carrito</button>
+                </td>
+                <td>
+                    <a class="btn btn-danger" href="{% url 'tienda:eliminar_wishlist' item.id %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <h3>
+            Tu wishlist está vacía, intenta añadiendo algunos productos.
+        </h3>
+        {% endif %}
+    </div>
+    <div class="col-1"></div>
+</div>
+{% endblock content %}
+{% block raw_js %}
+<script src="{% static 'js/wishlist.js' %}"></script>
+{% endblock raw_js %}

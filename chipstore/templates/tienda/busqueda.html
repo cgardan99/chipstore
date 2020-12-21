@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+{% load modulo_tag %}
+{% load restar %}
+{% block content %}
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <form class="form-inline" method="POST">
+            {% csrf_token %}
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="busqueda" class="sr-only">Buscar</label>
+                <input type="text" class="form-control" id="busqueda" name="busqueda"
+                    placeholder="Ingresa una nueva búsqueda">
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Buscar</button>
+        </form>
+        <h1>{{ n_resultados }} encontrados para tu búsqueda "{{ busqueda }}"</h1>
+        {% for resultado in resultados %}
+        {% if not forloop.first and forloop.counter|restar:1|modulo:4 == 0 %}
+        <div class="row">
+            {% endif %}
+            {% if forloop.first %}
+            <div class="row text-center">
+                {% endif %}
+                <div class="p-2 col-lg-3">
+                    <div class="card" style="width: 18rem;">
+                        <img class="card-img-top" src="{{ resultado.thumbnail }}" alt="Card image cap">
+                        <br class="d-none" id="info-{{ forloop.counter0 }}" data-imagen="{{ resultado.thumbnail }}"
+                            data-nombre="{{ resultado.nombre }}" data-precio="{{ resultado.precio }}"
+                            data-sku="{{ resultado.sku }}" data-tienda="{{ resultado.tienda }}"
+                            data-url="{{ resultado.url }}" data-descripcion="{{ resultado.descripcion }}" />
+                        <div class="card-body">
+                            {% if request.user.is_authenticated %}
+                            <div class="row">
+                                <div class="col-3"></div>
+                                <div class="col-6 p-2">
+                                    <button onclick="enviarWishlist({{ forloop.counter0 }})"
+                                        class="btn btn-warning">Wishlist</button>
+                                </div>
+                                <div class="col-3"></div>
+                            </div><br>
+                            <div class="row">
+                                <div class="col-7">
+                                    <input class="form-control w-100" type="number" name="input-{{ forloop.counter0 }}"
+                                        id="input-{{ forloop.counter0 }}" step="1" min="1" value="1">
+                                </div>
+                                <div class="col-5">
+                                    <button onclick="enviarCarrito({{ forloop.counter0 }})"
+                                        class="btn w-100 btn-success">Carrito</button>
+                                </div>
+                            </div><br>
+                            {% endif %}
+                            <h5 class="card-title">{{ resultado.nombre }}</h5>
+                            <p class="card-text">{{ resultado.precio }}</p>
+                            <p class="card-text">SKU: {{ resultado.sku }}</p>
+                            <div class="row">
+                                <div class="col-6">Tienda: <a href="">{{ resultado.tienda }}</a></div>
+                                <div class="col-6"><a class="btn btn-secondary" target="_blank"
+                                        href="{{ resultado.url }}">Ir a tienda</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if not forloop.last and not forloop.first and forloop.counter|modulo:4 == 0 %}
+            </div>
+            {% endif %}
+            {% if forloop.last %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div class="col-1"></div>
+</div>
+{% endblock content %}
+{% block raw_js %}
+<script type="text/javascript">
+    function enviarCarrito(id) {
+        let item = document.getElementById(`info-${id}`);
+        let cantidad = document.getElementById(`input-${id}`).value;
+        var dataset = item.dataset;
+        if (parseInt(cantidad) > 0) {
+            var payload = {
+                "imagen": dataset["imagen"],
+                "nombre": dataset["nombre"],
+                "precio": dataset["precio"],
+                "sku": dataset["sku"],
+                "tienda": dataset["tienda"],
+                "url": dataset["url"],
+                "descripcion": dataset["descripcion"],
+                "cantidad": cantidad
+            }
+            $.ajax({
+                type: "POST",
+                url: "../agregar_carrito",
+                headers: { "X-CSRFToken": '{{csrf_token}}' },
+                data: payload,
+                success: function (datos) {
+                    alert("Productos añadidos exitosamente.");
+                }
+            });
+        } else {
+            alert("Debe haber al menos un producto en cantidad.");
+        }
+    }
+    function enviarWishlist(id) {
+        let item = document.getElementById(`info-${id}`);
+        var dataset = item.dataset;
+        let cantidad = document.getElementById(`input-${id}`).value;
+        if (parseInt(cantidad) > 0) {
+            var payload = {
+                "imagen": dataset["imagen"],
+                "nombre": dataset["nombre"],
+                "precio": dataset["precio"],
+                "sku": dataset["sku"],
+                "tienda": dataset["tienda"],
+                "url": dataset["url"],
+                "descripcion": dataset["descripcion"],
+                "cantidad": cantidad
+            }
+            $.ajax({
+                type: "POST",
+                url: "../agregar_wishlist",
+                headers: { "X-CSRFToken": '{{csrf_token}}' },
+                data: payload,
+                success: function (datos) {
+                    alert("Productos añadidos exitosamente.");
+                }
+            });
+        } else {
+            alert("Debe haber al menos un producto en cantidad.");
+        }
+    }
+</script>
+{% endblock raw_js %}

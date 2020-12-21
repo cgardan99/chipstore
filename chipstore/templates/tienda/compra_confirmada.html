@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% block content %}
+<div style="background:#e6e6e6; padding: 20px 10%;">
+    <div style="text-align: center; background:white;">
+        <div style=" text-align:left; height: 60px; background: #016b0a; padding:10px; color:white; font-size: 40px;">
+            The Chip Store</div>
+        <div class="alert alert-success" role="alert">
+            <strong>¡Bien!</strong> Hemos enviado un correo de confirmación de compra.
+        </div>
+        <div style="padding: 20px;">
+            <p>Compra no. <strong>{{ carrito.id }}</strong></p>
+            <h1 style="text-align:center;">¡Muchas gracias por tu compra!</h1>
+            <br>
+            <br>
+            <div style="text-align:center;">
+                <img style="height:200px;" src="{% static 'images/logo/tcs.png' %}">
+            </div>
+            <br>
+            <h3 style="text-align:center;">¿Qué compraste?</h3>
+            <div style="text-align:left">
+                <table class="table table-hover table-dark">
+                    <tr>
+                        <th>Tienda</th>
+                        <th>SKU</th>
+                        <th>Nombre</th>
+                        <th>Imagen</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>PU</th>
+                    </tr>
+                    {% for item in carrito.itemcompra_set.all %}
+                    <tr>
+                        <td>{{ item.item.tienda }}</td>
+                        <td>{{ item.item.sku }}</td>
+                        <td>{{ item.item.nombre }}</td>
+                        <td>
+                            <img class="w-50" style="max-height: 60px;" src="{{ item.item.foto }}" alt="foto_referencia_producto">
+                        </td>
+                        <td>{{ item.item.descripcion }}</td>
+                        <td class="cantidad" id="cantidad-{{ forloop.counter0 }}">{{ item.cantidad }}</td>
+                        <td id="precio-{{ forloop.counter0 }}">{{ item.item.precio }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="6"><b class="float-right">Total (USD):</b></td>
+                        <td class="text-right" id="grand_total">{{ carrito.total }}</td>
+                    </tr>
+                </table>
+                <p>Fecha de compra: <b>{{ carrito.fecha }}</b></p>
+            </div>
+            <br>
+            <br>
+            <br>
+            <br>
+            <p>¡Qué disfrutes tus productos!</p>
+            <p><strong>El equipo de The Chip Store.</strong></p>
+        </div>
+    </div>
+</div>
+{% endblock content %}

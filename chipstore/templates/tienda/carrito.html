@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row mt-3">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <h2>Tu carrito de compras.</h2>
+        <br>
+        {% if carrito %}
+        <table class="table table-hover table-dark">
+            <tr>
+                <th>Tienda</th>
+                <th>SKU</th>
+                <th>Nombre</th>
+                <th>Imagen</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>PU</th>
+                <th>Subtotal</th>
+                <th>Eliminar</th>
+            </tr>
+            {% for item in carrito.itemcompra_set.all %}
+            <tr>
+                <td>{{ item.item.tienda }}</td>
+                <td>{{ item.item.sku }}</td>
+                <td>{{ item.item.nombre }}</td>
+                <td>
+                    <img class="w-50" src="{{ item.item.foto }}" alt="foto_referencia_producto">
+                </td>
+                <td>{{ item.item.descripcion }}</td>
+                <td class="cantidad" id="cantidad-{{ forloop.counter0 }}">{{ item.cantidad }}</td>
+                <td id="precio-{{ forloop.counter0 }}">{{ item.item.precio }}</td>
+                <td id="subtotal-{{ forloop.counter0 }}"></td>
+                <td>
+                    <a class="btn btn-danger" href="{% url 'tienda:eliminar' item.id %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="7"><b class="float-right">Total (USD):</b></td>
+                <td class="text-right" id="grand_total"></td>
+            </tr>
+        </table>
+        
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" type="number" name="total" id="total">
+                    <button type="submit" class="btn btn-primary w-100">Terminar Compra</button>
+                </form>
+            </div>
+            <div class="col-4"></div>
+        </div>
+        {% else %}
+        <h3>
+            Tu carrito está vacío, intenta añadiendo algunos productos.
+        </h3>
+        {% endif %}
+    </div>
+    <div class="col-1"></div>
+</div>
+{% endblock content %}
+{% block raw_js %}
+<script src="{% static 'js/carrito.js' %}"></script>
+{% endblock raw_js %}

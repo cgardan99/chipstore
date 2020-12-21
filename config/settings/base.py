@@ -42,14 +42,7 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        'NAME': env.read_env("POSTGRES_DB", default="chipstore"),
-        'USER': env.read_env("POSTGRES_USER", default="chipstore"),
-        'PASSWORD': env.read_env("POSTGRES_PASSWORD", default="chipstore"),
-        'HOST': env.read_env("POSTGRES_HOST", default="chipstore"),
-        'PORT': env.read_env("POSTGRES_PORT", default="5432"),
-        'ENGINE': 'django.db.backends.postgresql'
-    }
+    "default": env.db("DATABASE_URL", default="postgres:///chipstore")
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
@@ -81,6 +74,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    "chipstore.accounts.apps.AccountsConfig",
     "chipstore.users.apps.UsersConfig",
     "chipstore.tienda.apps.TiendaConfig",
     # Your stuff: custom apps go here

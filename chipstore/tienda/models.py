@@ -6,7 +6,11 @@ User = get_user_model()
 
 
 class Tienda(models.Model):
-    nombre = models.CharField(max_length=80)
+    TIENDA_CHOICES = (
+        ("BESTBUY", "Best Buy"),
+        ("TARGET", "Target")
+    )
+    nombre = models.CharField('Tienda disponible de dispositivo', max_length=80, choices=TIENDA_CHOICES, unique=True)
     api_key = models.CharField(max_length=80)
     base_api_url = models.URLField()
     base_web_url = models.URLField()
@@ -21,11 +25,12 @@ class Tienda(models.Model):
 
 class Item(models.Model):
     sku = models.CharField(max_length=80, unique=True)
-    nombre = models.CharField(max_length=50, blank=True)
+    nombre = models.CharField(max_length=150, blank=True)
     uri = models.URLField(max_length=400)
     foto = models.ImageField(upload_to=get_image_directory_path)
     descripcion = models.TextField()
     precio = models.DecimalField(max_digits=12, decimal_places=2)
+    tienda = models.ForeignKey(Tienda, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Item"
@@ -36,25 +41,27 @@ class Item(models.Model):
 
 
 class Compra(models.Model):
-    item = models.ManyToManyField(Item, through='ItemCompra')
+    item = models.ManyToManyField(Item, through="ItemCompra")
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     confirmado = models.BooleanField(default=False)
+    fecha = models.DateField(null=True)
+    total = models.FloatField(null=True)
 
     class Meta:
         verbose_name = "Compra"
         verbose_name_plural = "Compras"
 
     def __str__(self):
-        value = '{} de {}'
+        value = "{} de {}"
         if self.confirmado:
-            return value.format('Compra', self.usuario.nombre)
-        return value.format('Carrito', self.usuario.nombre)
+            return value.format("Compra", self.usuario.name)
+        return value.format("Carrito", self.usuario.name)
 
 
 class ItemCompra(models.Model):
     compra = models.ForeignKey(Compra, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
+    cantidad = models.IntegerField(null=True)
 
     class Meta:
         verbose_name = "ItemCompra"
@@ -66,7 +73,7 @@ class ItemCompra(models.Model):
 
 class WhishList(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    item = models.ManyToManyField(Item, through='ItemWhishList')
+    item = models.ManyToManyField(Item, through="ItemWhishList")
     creado = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(auto_now=True)
 
@@ -75,13 +82,14 @@ class WhishList(models.Model):
         verbose_name_plural = "WhishLists"
 
     def __str__(self):
-        pass
+        value = "{} de {}"
+        return value.format("WishList", self.usuario.name)
 
 
 class ItemWhishList(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     whishlist = models.ForeignKey(WhishList, on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
+    cantidad = models.IntegerField(null=True)
 
     class Meta:
         verbose_name = "ItemWhishList"

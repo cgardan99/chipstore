@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row mt-3">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <h2>Detalle de tu compra:</h2>
+        <br>
+        <table class="table table-hover table-dark">
+            <tr>
+                <th>Tienda</th>
+                <th>SKU</th>
+                <th>Nombre</th>
+                <th>Imagen</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>PU</th>
+                <th>Subtotal</th>
+            </tr>
+            {% for item in carrito.itemcompra_set.all %}
+            <tr>
+                <td>{{ item.item.tienda }}</td>
+                <td>{{ item.item.sku }}</td>
+                <td>{{ item.item.nombre }}</td>
+                <td>
+                    <img class="w-50" src="{{ item.item.foto }}" alt="foto_referencia_producto">
+                </td>
+                <td>{{ item.item.descripcion }}</td>
+                <td class="cantidad" id="cantidad-{{ forloop.counter0 }}">{{ item.cantidad }}</td>
+                <td id="precio-{{ forloop.counter0 }}">{{ item.item.precio }}</td>
+                <td id="subtotal-{{ forloop.counter0 }}"></td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="7"><b class="float-right">Total (USD):</b></td>
+                <td class="text-right" id="grand_total"></td>
+            </tr>
+        </table>
+        
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <a href="{% url 'users:detail' request.user.username %}" class="btn btn-warning w-100">Regresar</a>
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </div>
+    <div class="col-1"></div>
+</div>
+{% endblock content %}
+{% block raw_js %}
+<script src="{% static 'js/carrito.js' %}"></script>
+{% endblock raw_js %}

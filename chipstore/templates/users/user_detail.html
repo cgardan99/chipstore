@@ -1,36 +1,57 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}User: {{ object.username }}{% endblock %}
+{% block title %}{{ object.username }}{% endblock %}
 
 {% block content %}
 <div class="container">
-
   <div class="row">
-    <div class="col-sm-12">
-
+    <div class="col-md-4 text-center">
       <h2>{{ object.username }}</h2>
-      {% if object.name %}
-        <p>{{ object.name }}</p>
-      {% endif %}
+      <img src="{{ MEDIA_URL }}{{ object.foto }}" alt="foto_perfil" width="50%" class="mx-auto mt-3">
+      <p class="text-muted">{{ object.tipo }}</p>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <h5 class="card-header">Información general:</h5>
+        <div class="card-body">
+          <p class="card-text"><b>{{ object.name }}</b></p>
+          <p class="card-text">{{ object.email }}</p>
+          <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">Actualizar mi nombre</a>
+          <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">Ver mis direcciones de correo</a>
+        </div>
+      </div>
     </div>
   </div>
 
-{% if object == request.user %}
-<!-- Action buttons -->
-<div class="row">
-
-  <div class="col-sm-12">
-    <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
-    <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">E-Mail</a>
-    <!-- Your Stuff: Custom user template urls -->
+  <div class="row">
+    <div class="col-1"></div>
+    <div class="col-10">
+      {% if object.compra_set.exists %}
+      <h2>Mis compras:</h2>
+      <table class="table table-light table-hover">
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Total Compra</th>
+          <th>Ver</th>
+        </tr>
+        {% for compra in object.compra_set.all %}
+        <tr>
+          <td>{{ compra.id }}</td>
+          <td>{{ compra.fecha }}</td>
+          <td>{{ compra.total }}</td>
+          <td>
+            <a href="{% url 'tienda:detalle_compra' compra.id %}" class="btn btn-secondary">Ver</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% else %}
+      <h2>No has hecho compras actualmente.</h2>
+      {% endif %}
+    </div>
+    <div class="col-1"></div>
   </div>
-
-</div>
-<!-- End Action buttons -->
-{% endif %}
-
-
 </div>
 {% endblock content %}
-

@@ -37,7 +37,7 @@ if READ_DOT_ENV_FILE:
     )
 else:
     os.environ.setdefault(
-        "DJANGO_SETTINGS_MODULE", "radon.config.settings.production"
+        "DJANGO_SETTINGS_MODULE", "config.settings.production"
     )
 
 application = get_wsgi_application()

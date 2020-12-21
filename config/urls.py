@@ -6,7 +6,8 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    #TemplateView.as_view(template_name="pages/home.html")
+    path("", include("chipstore.tienda.urls", namespace="tienda"), name="home"),
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
@@ -14,7 +15,7 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("chipstore.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
+    path("accounts/", include("chipstore.accounts.urls")),
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
